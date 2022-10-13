@@ -1,28 +1,35 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "primereact/button";
-import { useGoogleLogin } from "@react-oauth/google";
 import { useDispatch, useSelector } from "react-redux";
-import { loginTeacherAction, signupTeacherAction } from "../slices/teacherSlice";
-import { useRef } from "react";
-import { useState } from "react";
+import { loginAction } from "../slices/authSlice";
 import { InputText } from "primereact/inputtext";
+import { signInToGetIDToken } from "../firebase";
+import { createTeacherAction, getTeacherAction } from "../slices/teacherSlice";
 import "./Login.css";
 
 export default function Login() {
   const dispatch = useDispatch();
-  const isRejected = useSelector((store) => store.teacher?.loginRejected);
+  const loggedIn = useSelector(store => store.auth?.loggedIn);
 
-  const [accessToken, setAccessToken] = useState(null);
   const teacherNameInput = useRef(null);
 
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => {
-      setAccessToken(codeResponse.access_token);
-      dispatch(loginTeacherAction(codeResponse.access_token));
-    },
-  });
+  useEffect(() => {
+    dispatch(getTeacherAction());
+  }, [dispatch]);
 
-  const signup = () => dispatch(signupTeacherAction({ fullName: teacherNameInput.current.value, accessToken }));
+  useEffect(() => {
+    if (loggedIn) dispatch(getTeacherAction());
+  }, [dispatch, loggedIn]);
+
+  const login = async () => {
+    const token = await signInToGetIDToken();
+    dispatch(loginAction(token));
+  }
+
+  const createTeacher = async () => {
+    const name = teacherNameInput.current.value;
+    dispatch(createTeacherAction(name))
+  }
 
   return (
     <>
@@ -59,7 +66,7 @@ export default function Login() {
       </div>
       <div className="entry-page__login-form">
         <h1 className="entry-page__title">Welcome to TrackMate!</h1>
-        {!isRejected ? (
+        {!loggedIn ? (
           <>
             <p>Login with your Google Account. If you didn't have an account, you can sign up!</p>
             <div className="entry-page__inputs">
@@ -69,11 +76,11 @@ export default function Login() {
         ) : (
           <div></div>
         )}
-        {isRejected ? (
+        {loggedIn ? (
           <>
             <p>You don't have an account yet. Please write your name down below to make one!</p>
             <InputText style={{ margin: "5px" }} ref={teacherNameInput} type="text" placeholder="Write your full name..." />
-            <Button onClick={signup} label="Make a new account" />
+            <Button onClick={createTeacher} label="Make a new account" />
           </>
         ) : (
           <div></div>

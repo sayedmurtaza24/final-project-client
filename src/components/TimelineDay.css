@@ -4,10 +4,6 @@
     cursor: pointer;
 }
 
-.timeline__day:hover {
-    background-color: rgba(79, 141, 137, 0.5);
-}
-
 .timeline__day:nth-child(odd) {
     background: rgba(230, 230, 230, 0.2);
 }
@@ -71,4 +67,12 @@
 
 .timeline-cal__year {
   font-size: 10px;
+}
+
+.timeline__day:hover {
+    background-color: rgba(79, 141, 137, 0.5) !important;
+}
+
+.timeline__day-selected {
+    background-color: rgba(95, 167, 162, 0.5) !important;
 }

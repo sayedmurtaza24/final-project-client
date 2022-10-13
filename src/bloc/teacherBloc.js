@@ -1,20 +1,14 @@
 import { baseUrl } from "../config";
+import httpClient from '../http';
 
 export default (function () {
+  const basePath = baseUrl + "/api/teachers"
   return {
-    loginTeacher: async (access_token) => {
-      const res = await fetch(`${baseUrl}api/teachers/login/${access_token}`, { method: "POST" });
-      return res.json();
+    getTeacher: () => {
+      return httpClient.get(basePath);
     },
-    signupTeacher: async (fullName, access_token) => {
-      const res = await fetch(`${baseUrl}api/teachers/signup/${access_token}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ fullName }),
-      });
-      return res.json();
+    signupTeacher: name => {
+      return httpClient.post(basePath, { body: { name } });
     },
   };
 })();

@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Chart } from "primereact/chart";
 import { useSelector, useDispatch } from "react-redux";
+import { getClassStatisticsAction } from "../slices/classSlice";
 import "./Statistics.css";
 
 function Statistics() {
   const dispatch = useDispatch();
   const statistics = useSelector((store) => store.class.currentClassStats);
-  const classUuid = useSelector((store) => store.class.currentClass?.uuid);
+  const classId = useSelector((store) => store.class.currentClass?.id);
 
   const [basicData, setBasicData] = useState({});
+
+  useEffect(() => {
+    dispatch(getClassStatisticsAction(classId))
+  }, [classId, dispatch]);
 
   useEffect(() => {
     if (statistics) {
@@ -35,7 +40,7 @@ function Statistics() {
         ],
       });
     }
-  }, [statistics, classUuid, dispatch]);
+  }, [statistics, classId, dispatch]);
 
   let basicOptions = {
     maintainAspectRatio: false,
@@ -73,19 +78,19 @@ function Statistics() {
         <div className="overview-stats">
           <div>
             <p>Total number of students:</p>
-            <p>{statistics?.totalStudentCount === "NaN" ? "0" : statistics?.totalStudentCount}</p>
+            <p>{statistics?.totalStudents === "NaN" ? "0" : statistics?.totalStudents}</p>
           </div>
           <div>
             <p>Average Class Presence Rate</p>
-            <p>{statistics?.averagePresenceRate === "NaN" ? "0" : statistics?.averagePresenceRate}%</p>
+            <p>{statistics?.presenceRateAverage === "NaN" ? "0" : statistics?.presenceRateAverage}%</p>
           </div>
           <div>
             <p>Average Class Good Performance Rate</p>
-            <p>{statistics?.averageGoodPerfRate === "NaN" ? "0" : statistics?.averageGoodPerfRate}%</p>
+            <p>{statistics?.goodPerfRateAverage === "NaN" ? "0" : statistics?.goodPerfRateAverage}%</p>
           </div>
           <div>
             <p>Average Class Good Behaviour Rate</p>
-            <p>{statistics?.averageGoodBehaveRate === "NaN" ? "0" : statistics?.averageGoodBehaveRate}%</p>
+            <p>{statistics?.goodBehaveRateAverage === "NaN" ? "0" : statistics?.goodBehaveRateAverage}%</p>
           </div>
         </div>
         <Chart type="bar" data={basicData} options={basicOptions} />

@@ -1,6 +1,6 @@
 import React from "react";
 import { ConfirmDialog } from "primereact/confirmdialog";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { deleteStudentAction } from "../slices/studentSlice";
 import { Button } from "primereact/button";
 import { useState } from "react";
@@ -8,15 +8,14 @@ import { Menu } from "primereact/menu";
 import { useRef } from "react";
 import './DeleteStudent.css';
 
-function DeleteStudent({ uuid }) {
+function DeleteStudent({ id, classId }) {
     const menu = useRef(null);
     const [visible, setVisible] = useState(false);
 
     const dispatch = useDispatch();
-    const currentClass = useSelector((store) => store.class?.currentClass);
 
     const deleteStudent = () => {
-        dispatch(deleteStudentAction({ uuid, classUuid: currentClass.uuid }));
+        dispatch(deleteStudentAction({ studentId: id, classId }));
     };
 
     const items = [

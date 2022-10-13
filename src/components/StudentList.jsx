@@ -5,7 +5,7 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { useSelector, useDispatch } from "react-redux";
-import { addStudentAction, fetchOneStudentAction } from "../slices/studentSlice";
+import { createStudentAction, getStudentAction } from "../slices/studentSlice";
 import DeleteStudent from "./DeleteStudent";
 import "./StudentList.css";
 
@@ -17,17 +17,16 @@ function StudentList() {
   const [genderValue, setGenderValue] = useState("");
   const [showAddStudent, setShowAddStudent] = useState(false);
 
-  const studentList = useSelector((store) => store.class?.currentClass?.students);
-  const currentClass = useSelector((store) => store.class?.currentClass?.uuid);
-  const currentStudent = useSelector((store) => store.students?.currentStudent?.uuid);
+  const currentClass = useSelector(store => store.class?.currentClass);
+  const currentStudent = useSelector(store => store.student?.currentStudent);
 
   const addStudent = () => {
     if (!dobValue || !nameValue || !genderValue) return;
     dispatch(
-      addStudentAction({
-        classUuid: currentClass,
-        studentName: nameValue,
-        dob: dobValue.toISOString(),
+      createStudentAction({
+        classId: currentClass.id,
+        name: nameValue,
+        dob: dobValue.getUTCFullYear() + "-" + dobValue.getUTCMonth() + "-" + dobValue.getUTCDate(),
         gender: genderValue,
       })
     );
@@ -49,18 +48,18 @@ function StudentList() {
             return (
               <div className="student-list-item">
                 {option.name}
-                <DeleteStudent uuid={option.uuid} />
+                <DeleteStudent id={option.id} classId={currentClass.id} />
               </div>
             );
           }}
           filterPlaceholder="Search students..."
           className="student-listbox"
-          options={studentList}
-          value={currentStudent}
+          options={currentClass?.students || []}
+          value={currentStudent?.id}
           optionLabel={"name"}
-          optionValue={"uuid"}
+          optionValue={"id"}
           onChange={(e) => {
-            dispatch(fetchOneStudentAction(e.value));
+            dispatch(getStudentAction(e.value));
           }}
         />
       </div>

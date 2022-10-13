@@ -4,16 +4,20 @@ import { ToggleButton } from "primereact/togglebutton";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Calendar } from "primereact/calendar";
 import { useDispatch, useSelector } from "react-redux";
-import { addToStudentTimelineAction, editStudentTimelineAction } from "../slices/studentSlice";
-import "./Form.css";
 import { useEffect } from "react";
+import {
+  createAssessmentAction,
+  resetAssessments,
+  selectAssessment,
+  updateAssessmentAction
+} from "../slices/assessmentSlice";
+import "./Form.css";
 
 function Form() {
   const dispatch = useDispatch();
-  const studentUuid = useSelector((store) => store.students?.currentStudent?.uuid);
-  const studentTimeline = useSelector((store) => store.students?.currentStudent?.assessments);
+  const currentStudent = useSelector((store) => store.student?.currentStudent);
+  const currentAssessment = useSelector((store) => store.assessment?.currentAssessment);
   const [editMode, setEditMode] = useState(false);
-  const [timelineUuid, setTimelineUuid] = useState(null);
   const [present, setPresent] = useState(true);
   const [goodPerf, setGoodPerf] = useState(true);
   const [goodBehave, setGoodBehave] = useState(true);
@@ -23,41 +27,48 @@ function Form() {
 
   useEffect(() => {
     date.setHours(12);
-    const found = studentTimeline.find(timelineObj => timelineObj.date.split('T')[0] === date.toISOString().split('T')[0]);
+    const found = currentStudent?.assessments.find(timelineObj => {
+      return timelineObj.date.split('T')[0] === date.toISOString().split('T')[0]
+    });
     if (found) {
-      setTimelineUuid(found.uuid);
-      setPresent(found.present);
-      setGoodPerf(found.goodPerf);
-      setGoodBehave(found.goodBehave);
-      setPerfComment(found.perfComment);
-      setBehaveComment(found.behaveComment);
+      dispatch(selectAssessment(found))
       setEditMode(true);
     } else {
-      setTimelineUuid(null);
-      setEditMode(false);
-      setPresent(true);
-      setGoodPerf(true);
-      setGoodBehave(true);
-      setPerfComment('');
-      setBehaveComment('');
+      dispatch(resetAssessments())
+      setEditMode(false)
     }
-  }, [date, studentTimeline]);
+  }, [dispatch, date, currentStudent]);
+
+  useEffect(() => {
+    if (currentAssessment) {
+      setPresent(currentAssessment.present);
+      setGoodBehave(currentAssessment.good_behave);
+      setGoodPerf(currentAssessment.good_perf);
+      setPerfComment(currentAssessment.perf_comment ?? "");
+      setBehaveComment(currentAssessment.behave_comment ?? "");
+      setDate(new Date(currentAssessment.date));
+    } else {
+      setPresent(true)
+      setGoodPerf(false)
+      setGoodBehave(false)
+      setPerfComment("")
+      setBehaveComment("")
+    }
+  }, [currentAssessment]);
 
   const addToStudentTimeline = () => {
     const payload = {
-      studentUuid,
-      timelineUuid,
-      timeline: {
-        date: date.toISOString(),
-        present,
-        goodBehave,
-        goodPerf,
-        perfComment,
-        behaveComment,
-      },
+      studentId: currentStudent.id,
+      assessmentId: currentAssessment?.id,
+      date: date.toISOString().split("T")[0],
+      present,
+      good_behave: goodBehave,
+      good_perf: goodPerf,
+      perf_comment: perfComment,
+      behave_comment: behaveComment,
     };
 
-    dispatch(!editMode ? addToStudentTimelineAction(payload) : editStudentTimelineAction(payload));
+    dispatch(!editMode ? createAssessmentAction(payload) : updateAssessmentAction(payload));
     setPresent(true);
     setGoodPerf(true);
     setGoodBehave(true);
@@ -82,7 +93,7 @@ function Form() {
             checked={present}
             onChange={() => setPresent(!present)}
           />
-          <Calendar value={date} id="icon" onChange={(e) => setDate(e.value)} showIcon />
+          <Calendar dateFormat="yy-mm-dd" value={date} id="icon" onChange={(e) => setDate(e.value)} showIcon />
         </div>
         <div className="form__part">
           <ToggleButton

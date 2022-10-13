@@ -1,78 +1,43 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import studentBloc from "../bloc/studentBloc";
-import { fetchOneClassAction } from "./classSlice";
+import { getClassAction } from "./classSlice";
 
 const initialState = {
   currentStudent: null,
 };
 
 //get one student
-export const fetchOneStudentAction = createAsyncThunk("fetchOneStudent", async (uuid) => {
-  return await studentBloc.fetchOneStudent(uuid);
+export const getStudentAction = createAsyncThunk("getStudent", async id => {
+  return await studentBloc.getStudent(id);
 });
 
 //add one student
-export const addStudentAction = createAsyncThunk("addStudent", async ({ classUuid, studentName, dob, gender }, thunkAPI) => {
-  await studentBloc.addStudent({
-    classUuid,
-    studentName,
+export const createStudentAction = createAsyncThunk("createStudent", async ({ classId, name, dob, gender }, thunk) => {
+  const res = await studentBloc.createStudent(classId, {
+    name,
     dob,
     gender,
   });
-  thunkAPI.dispatch(fetchOneClassAction(classUuid));
+  thunk.dispatch(getClassAction(classId));
+  return res;
 });
 
-//add to student timeline
-export const addToStudentTimelineAction = createAsyncThunk(
-  "addToStudentTimeline",
-  async ({ studentUuid, timeline: { present, goodBehave, goodPerf, behaveComment, perfComment, date } }, thunkAPI) => {
-    await studentBloc.addToStudentTimeline(studentUuid, {
-      present,
-      goodBehave,
-      goodPerf,
-      behaveComment,
-      perfComment,
-      date,
-    });
-    thunkAPI.dispatch(fetchOneStudentAction(studentUuid));
-  }
-);
-
-//edit student timeline
-export const editStudentTimelineAction = createAsyncThunk(
-  "editStudentTimeline",
-  async ({ studentUuid, timelineUuid, timeline: { present, goodBehave, goodPerf, behaveComment, perfComment, date } }, thunkAPI) => {
-    await studentBloc.editStudentTimeline(studentUuid, timelineUuid, {
-      present,
-      goodBehave,
-      goodPerf,
-      behaveComment,
-      perfComment,
-      date,
-    });
-    thunkAPI.dispatch(fetchOneStudentAction(studentUuid));
-  }
-);
+//add one student
+export const updateStudentAction = createAsyncThunk("updateStudent", async ({ studentId, name, dob, gender, phone, email }) => {
+  return await studentBloc.updateStudent(studentId, {
+    name,
+    dob,
+    gender,
+    phone,
+    email,
+  });
+});
 
 //delete one student
-export const deleteStudentAction = createAsyncThunk("deleteStudent", async ({ uuid, classUuid }, thunkAPI) => {
-  await studentBloc.deleteStudent(uuid);
-  thunkAPI.dispatch(fetchOneClassAction(classUuid));
+export const deleteStudentAction = createAsyncThunk("deleteStudent", async ({ studentId, classId }, thunk) => {
+  await studentBloc.deleteStudent(studentId);
+  thunk.dispatch(getClassAction(classId));
 });
-
-//edit student profile
-export const editStudentProfileAction = createAsyncThunk(
-  "editStudentProfile",
-  async ({ studentUuid, profile: { studentName, dob, gender, emergencyContact } }, thunkAPI) => {
-    await studentBloc.editStudentProfile(studentUuid, {
-      studentName,
-      dob,
-      gender,
-      emergencyContact,
-    });
-    thunkAPI.dispatch(fetchOneStudentAction(studentUuid));
-  }
-);
 
 //studentSlice
 const studentSlice = createSlice({
@@ -84,8 +49,17 @@ const studentSlice = createSlice({
     },
   },
   extraReducers: {
-    [fetchOneStudentAction.fulfilled]: (state, action) => {
+    [getStudentAction.fulfilled]: (state, action) => {
       state.currentStudent = action.payload;
+    },
+    [createStudentAction.fulfilled]: (state, action) => {
+      state.currentStudent = action.payload;
+    },
+    [updateStudentAction.fulfilled]: (state, action) => {
+      state.currentStudent = action.payload;
+    },
+    [deleteStudentAction.fulfilled]: state => {
+      state.currentStudent = null;
     },
   },
 });

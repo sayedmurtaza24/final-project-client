@@ -4,7 +4,17 @@ import { useSelector } from "react-redux";
 import "./Timeline.css";
 
 function Timeline() {
-  const timeline = useSelector((store) => store.students?.currentStudent?.assessments);
+  const timeline = useSelector((store) => store.student?.currentStudent?.assessments);
+  const currentAssessment = useSelector(store => store.assessment?.currentAssessment);
+
+  const sortTimeline = (timelineList = []) => {
+    return timelineList.slice().sort((a, b) => {
+      const da = new Date(a.date), db = new Date(b.date);
+      if (da > db) return 1;
+      else if (da < db) return -1;
+      else return 0;
+    });
+  }
 
   return (
     <div className="timeline">
@@ -18,8 +28,8 @@ function Timeline() {
       </div>
       {timeline.length ? (
         <div className="timeline__calendar">
-          {timeline?.map((timelineDay) => (
-            <TimelineDay key={timelineDay.uuid} timeline={timelineDay} />
+          {sortTimeline(timeline)?.map((timelineDay) => (
+            <TimelineDay key={timelineDay.id} timeline={timelineDay} isSelected={currentAssessment?.id === timelineDay.id} />
           ))}
         </div>
       ) : (

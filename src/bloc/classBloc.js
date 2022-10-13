@@ -1,25 +1,17 @@
 import { baseUrl } from "../config";
+import httpClient from "../http"
 
 export default (function () {
+  const basePath = baseUrl + "/api/classes"
   return {
-    fetchOneClass: async (uuid) => {
-      const res = await fetch(`${baseUrl}api/classes/${uuid}`);
-      return res.json();
+    getClass: classId => {
+      return httpClient.get(`${basePath}/${classId}`);
     },
-    createOneClass: async (teacherUuid, className) => {
-      await fetch(`${baseUrl}api/classes/add/${teacherUuid}`, {
-        method: "post",
-        body: JSON.stringify({ className }),
-        headers: { "Content-Type": "application/json" },
-      });
+    createClass: name => {
+      return httpClient.post(`${basePath}`, { body: { name } });
     },
-    fetchStatistics: async (uuid) => {
-      const res = await fetch(`${baseUrl}api/classes/statistics/${uuid}`);
-      return res.json();
+    getStatistics: classId => {
+      return httpClient.get(`${basePath}/${classId}/statistics`);
     },
-    fetchAllClassesForATeacher: async (teacherUuid) => {
-      const res = await fetch(`${baseUrl}api/classes/all/${teacherUuid}`);
-      return res.json();
-    }
   };
 })();

@@ -1,35 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getTeacherAction } from "./teacherSlice"
 import classBloc from "../bloc/classBloc";
 
 const initialState = {
   currentClass: null,
-  currentClassStats: null,
-  classesList: [],
+  currentClassStats: null
 };
 
-export const fetchOneClassStatisticsAction = createAsyncThunk("fetchOneClassStatistics", async (uuid) => {
-  return await classBloc.fetchStatistics(uuid);
+export const getClassAction = createAsyncThunk("getClass", async classId => {
+  return await classBloc.getClass(classId);
 });
 
-export const fetchOneClassAction = createAsyncThunk("fetchOneClass", async (uuid, thunkAPI) => {
-  thunkAPI.dispatch(fetchOneClassStatisticsAction(uuid));
-  return await classBloc.fetchOneClass(uuid);
+export const createClassAction = createAsyncThunk("createClass", async (name, thunkAPI) => {
+  const response = await classBloc.createClass(name);
+  thunkAPI.dispatch(getTeacherAction());
+  return response;
 });
 
-export const fetchAllClassesAction = createAsyncThunk(
-  "fetchAllClasses",
-  async (teacherUuid) => {
-    return await classBloc.fetchAllClassesForATeacher(teacherUuid);
-  }
-);
-
-export const createClassAction = createAsyncThunk(
-  "createOneClass",
-  async ({teacherUuid, className}, thunkAPI) => {
-    await classBloc.createOneClass(teacherUuid, className);
-    thunkAPI.dispatch(fetchAllClassesAction(teacherUuid));
-  }
-);
+export const getClassStatisticsAction = createAsyncThunk("getClassStatistics", async classId => {
+  return await classBloc.getStatistics(classId);
+});
 
 const classSlice = createSlice({
   name: "class",
@@ -38,18 +28,17 @@ const classSlice = createSlice({
     resetClasses: (state) => {
       state.currentClass = null;
       state.currentClassStats = null;
-      state.classesList = [];
     }
   },
   extraReducers: {
-    [fetchOneClassAction.fulfilled]: (state, action) => {
+    [getClassAction.fulfilled]: (state, action) => {
       state.currentClass = action.payload;
     },
-    [fetchAllClassesAction.fulfilled]: (state, action) => {
-      state.classesList = action.payload;
-    },
-    [fetchOneClassStatisticsAction.fulfilled]: (state, action) => {
+    [getClassStatisticsAction.fulfilled]: (state, action) => {
       state.currentClassStats = action.payload;
+    },
+    [createClassAction.fulfilled]: (state, action) => {
+      state.currentClass = action.payload;
     },
   },
 });

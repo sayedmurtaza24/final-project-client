@@ -1,72 +1,24 @@
 import { baseUrl } from "../config";
+import httpClient from '../http';
 
 export default (function () {
+  const basePath = baseUrl + "/api/students"
   return {
-    //get one student
-    fetchOneStudent: async (uuid) => {
-      const res = await fetch(`${baseUrl}api/students/${uuid}`);
-      return res.json();
+    getStudent: student_id => {
+      return httpClient.get(`${basePath}/${student_id}`);
     },
-    //add one student
-    addStudent: async ({ classUuid, studentName, dob, gender }) => {
-      const res = await fetch(`${baseUrl}api/students/`, {
-        method: "POST",
-        body: JSON.stringify({ classUuid, studentName, dob, gender }),
-        headers: { "Content-Type": "application/json" },
-      });
-      return res.json();
+    createStudent: (class_id, { name, gender, dob }) => {
+      return httpClient.post(`${basePath}/?class_id=${class_id}`, {
+        body: { name, dob, gender }
+      })
     },
-    //add to one student timeline
-    addToStudentTimeline: async (studentUuid, { present, goodBehave, goodPerf, behaveComment, perfComment, date }) => {
-      const res = await fetch(`${baseUrl}api/students/${studentUuid}`, {
-        method: "POST",
-        body: JSON.stringify({
-          present,
-          goodBehave,
-          goodPerf,
-          behaveComment,
-          perfComment,
-          date,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-      return res.json();
+    updateStudent: (student_id, { name, gender, dob, phone, email }) => {
+      return httpClient.patch(`${basePath}/${student_id}`, {
+        body: { name, dob, gender, emergency_contact_phone: phone, emergency_contact_email: email, }
+      })
     },
-    //edit student timeline
-    editStudentTimeline: async (studentUuid, timelineUuid, { present, goodBehave, goodPerf, behaveComment, perfComment, date }) => {
-      const res = await fetch(`${baseUrl}api/students/${studentUuid}/${timelineUuid}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          present,
-          goodBehave,
-          goodPerf,
-          behaveComment,
-          perfComment,
-          date,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-      return res.json();
-    },
-    //edit student profile
-    editStudentProfile: async (studentUuid, { studentName, dob, gender, emergencyContact }) => {
-      const res = await fetch(`${baseUrl}api/students/${studentUuid}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          studentName,
-          dob,
-          gender,
-          emergencyContact,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-      return res.json();
-    },
-    //delete one student
-    deleteStudent: async (uuid) => {
-      await fetch(`${baseUrl}api/students/${uuid}`, {
-        method: "DELETE",
-      });
+    deleteStudent: student_id => {
+      return httpClient.delete(`${basePath}/${student_id}`);
     },
   };
 })();

@@ -1,10 +1,18 @@
 import React, { useState } from "react";
 import { Tooltip } from "primereact/tooltip";
+import { useDispatch } from "react-redux";
+import { selectAssessment } from '../slices/assessmentSlice'
 import "./TimelineDay.css";
 
-function TimelineDay({ timeline }) {
+function TimelineDay({ timeline, isSelected }) {
   const [showPerfComment, setShowPerfComment] = useState(null);
   const [showBehaveComment, setShowBehaveComment] = useState(null);
+
+  const dispatch = useDispatch()
+
+  const onSelected = () => {
+    dispatch(selectAssessment(timeline))
+  }
 
   const convertDate = (date) => {
     const dateObj = date?.split("T")[0].split("-");
@@ -55,7 +63,7 @@ function TimelineDay({ timeline }) {
     return { day, year, monthName };
   };
   return (
-    <div className="timeline__day">
+    <div className={"timeline__day " + (isSelected ? 'timeline__day-selected' : '')} onClick={onSelected}>
       <div className="timeline__day--date">
         <span className="timeline-cal__month">{convertDate(timeline.date).monthName}</span>
         <span className="timeline-cal__day">{convertDate(timeline.date).day}</span>
@@ -70,11 +78,11 @@ function TimelineDay({ timeline }) {
           onMouseEnter={() => setShowPerfComment(true)}
           onMouseLeave={() => setShowPerfComment(false)}
         >
-          <div className={"timeline__circle " + (!timeline.goodPerf ? "timeline__circle--off" : "")}></div>
+          <div className={"timeline__circle " + (!timeline.good_perf ? "timeline__circle--off" : "")}></div>
           {showPerfComment && (
             <Tooltip className="timeline__popup" target=".timeline__perf" mouseTrack mouseTrackLeft={10}>
               <h4>Performance Comment: </h4>
-              <p>{timeline.perfComment}</p>
+              <p>{timeline.perf_comment}</p>
             </Tooltip>
           )}
         </div>
@@ -85,11 +93,11 @@ function TimelineDay({ timeline }) {
           onMouseEnter={() => setShowBehaveComment(true)}
           onMouseLeave={() => setShowBehaveComment(false)}
         >
-          <div className={"timeline__circle " + (!timeline.goodBehave ? "timeline__circle--off" : "")}></div>
+          <div className={"timeline__circle " + (!timeline.good_behave ? "timeline__circle--off" : "")}></div>
           {showBehaveComment && (
             <Tooltip className="timeline__popup" target=".timeline__behave" mouseTrack mouseTrackLeft={10}>
               <h4>Behaviour Comment: </h4>
-              <p>{timeline.behaveComment}</p>
+              <p>{timeline.behave_comment}</p>
             </Tooltip>
           )}
         </div>
