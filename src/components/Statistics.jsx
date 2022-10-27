@@ -17,30 +17,51 @@ function Statistics() {
 
   useEffect(() => {
     if (statistics) {
+      let labels, data = {
+        presenceRate: [],
+        goodPerfRate: [],
+        goodBehaveRate: [],
+      };
+      labels = Object
+        .keys(statistics.weeklyData)
+        .map(key => {
+          const [weekNo, year] = key.split(" ");
+          return { weekNo, year, key };
+        })
+        .sort((a, b) => {
+          if (a.weekNo > b.weekNo && a.year >= b.year) return 1;
+          else return -1;
+        });
+      labels.forEach(label => {
+        data.presenceRate.push(statistics.weeklyData[label.key].presenceRate);
+        data.goodPerfRate.push(statistics.weeklyData[label.key].goodPerfRate);
+        data.goodBehaveRate.push(statistics.weeklyData[label.key].goodBehaveRate);
+      });
+
       setBasicData({
-        labels: Array(12)
-          .fill(null)
-          .map((_, i) => `Week ${i + 1}`),
+        labels: labels.map(l => `Week ${l.weekNo}`),
         datasets: [
           {
             label: "Presence Rate",
             backgroundColor: "#42A5F5",
-            data: statistics?.presenceRateWeekly,
+            data: data.presenceRate,
           },
           {
             label: "Good Performance Rate",
             backgroundColor: "#0ecbb5",
-            data: statistics?.goodPerfRateWeekly,
+            data: data.goodPerfRate,
           },
           {
             label: "Good Behaviour Rate",
             backgroundColor: "#0fba0f",
-            data: statistics?.goodBehaveRateWeekly,
+            data: data.goodBehaveRate,
           },
         ],
       });
+    } else {
+      setBasicData({});
     }
-  }, [statistics, classId, dispatch]);
+  }, [statistics, dispatch]);
 
   let basicOptions = {
     maintainAspectRatio: false,
@@ -73,7 +94,7 @@ function Statistics() {
   };
   return (
     <div className="statistics-page">
-      <div className="overview-chart">
+      {statistics ? <div className="overview-chart">
         <h2>Overview</h2>
         <div className="overview-stats">
           <div>
@@ -94,7 +115,10 @@ function Statistics() {
           </div>
         </div>
         <Chart type="bar" data={basicData} options={basicOptions} />
-      </div>
+      </div> :
+        <div className="overview-stats--no-data">
+          <p>No statistics available for the class yet!</p>
+        </div>}
     </div>
   );
 }

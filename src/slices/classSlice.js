@@ -37,6 +37,9 @@ const classSlice = createSlice({
     [getClassStatisticsAction.fulfilled]: (state, action) => {
       state.currentClassStats = action.payload;
     },
+    [getClassStatisticsAction.rejected]: (state, action) => {
+      state.currentClassStats = null;
+    },
     [createClassAction.fulfilled]: (state, action) => {
       state.currentClass = action.payload;
     },
