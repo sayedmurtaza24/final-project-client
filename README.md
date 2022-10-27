@@ -9,6 +9,9 @@ This project is a graduation project written by pepper.js mob in the last two we
 
 This is the client part written in react, to see the how we set up the server check out here [Server](https://github.com/martindospel/final-project-server).
 
+## Update
+* A better implementation of the app coupled with my FastApi REST backend is available now (check the branches of this repo).
+
 ## Demo
 Check a live demo of this app at [this link](https://track-mate.netlify.app).
 
