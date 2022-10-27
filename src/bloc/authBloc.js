@@ -10,6 +10,7 @@ const bloc = {
     if (isDevelopment) localStorage.setItem('token', res.token);
   },
   logout: () => {
+    if (isDevelopment) localStorage.removeItem('token');
     return httpClient.post(`${basePath}/logout`);
   },
 };

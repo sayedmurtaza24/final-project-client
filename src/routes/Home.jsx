@@ -13,8 +13,14 @@ function Home() {
   return (
     <div className="homepage-container">
       <Header />
-      <StudentList />
-      {currentStudent ? <Main /> : <div className="main-placeholder">{currentClass && <Statistics />}</div>}
+      {currentClass ? (
+        <>
+          <StudentList />
+          {currentStudent ? <Main /> : <div className="main-placeholder">{currentClass && <Statistics />}</div>}
+        </>
+      ) :
+        <div className="homepage--no-class"><p>Select or Create a class to get started!</p></div>
+      }
     </div>
   );
 }

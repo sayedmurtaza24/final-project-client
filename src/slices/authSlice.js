@@ -10,7 +10,7 @@ export const loginAction = createAsyncThunk("login", async idToken => {
 });
 
 export const logoutAction = createAsyncThunk("logout", async () => {
-  return await authBloc.logout()
+  return await authBloc.logout();
 });
 
 const authSlice = createSlice({

@@ -10,6 +10,7 @@ import "./Login.css";
 export default function Login() {
   const dispatch = useDispatch();
   const loggedIn = useSelector(store => store.auth?.loggedIn);
+  const currentTeacher = useSelector(store => store.teacher?.currentTeacher);
 
   const teacherNameInput = useRef(null);
 
@@ -76,7 +77,7 @@ export default function Login() {
         ) : (
           <div></div>
         )}
-        {loggedIn ? (
+        {loggedIn && !currentTeacher ? (
           <>
             <p>You don't have an account yet. Please write your name down below to make one!</p>
             <InputText style={{ margin: "5px" }} ref={teacherNameInput} type="text" placeholder="Write your full name..." />

@@ -3,9 +3,11 @@ import "./Header.css";
 import { Button } from "primereact/button";
 import { useDispatch } from "react-redux";
 import { resetTeacher } from "../slices/teacherSlice";
+import { logoutAction, resetAuth } from "../slices/authSlice";
 import { resetCurrentStudent } from "../slices/studentSlice";
 import { resetClasses } from "../slices/classSlice";
 import ChangeClass from "./ChangeClass";
+import { resetAssessments } from "../slices/assessmentSlice";
 
 function Header() {
   const dispatch = useDispatch();
@@ -27,8 +29,12 @@ function Header() {
           label="Logout"
           icon="pi pi-sign-out"
           onClick={() => {
+            dispatch(resetAssessments());
             dispatch(resetTeacher());
             dispatch(resetClasses());
+            dispatch(resetCurrentStudent());
+            dispatch(resetAuth());
+            dispatch(logoutAction());
           }}
           className="p-button-outlined p-button-sm"
         />
