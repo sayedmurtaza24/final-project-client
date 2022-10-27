@@ -1,5 +1,7 @@
 # Trackmate
 
+* Checkout `python-api` branch for the latest release that works with python backend written in FastAPI. (Main branch will contain the original implementation of the project)
+
 ## About
 Often working as a teacher, you have a lot of paperwork to do!... And you can only get so much information from papers... but what if all if that data was gathered in an application where you can visually see it, analyze it and make actual use of it? Pretty typical in the modern world isn't it? We decided to help school teachers to track absence, performance and behaviour of their student easily and effortlessly.
 
